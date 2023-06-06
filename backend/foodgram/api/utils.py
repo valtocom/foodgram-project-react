@@ -1,11 +1,10 @@
 import base64
 
-from django.shortcuts import get_object_or_404
+from django.shortcuts import HttpResponse, get_object_or_404
 from django.core.files.base import ContentFile
-from rest_framework import serializers, status
-from rest_framework.response import Response
+from rest_framework import serializers
 
-from recipes.models import Ingredient, Amount
+from recipes.models import Ingredient, RecipeIngredient
 
 
 class Base64ImageField(serializers.ImageField):
@@ -29,13 +28,13 @@ def create_ingredients(ingredients, recipe):
         )
         amount = ingredient.get('amount')
         ingredient_list.append(
-            Amount(
+            RecipeIngredient(
                 recipe=recipe,
                 ingredient=current_ingredient,
                 amount=amount
             )
         )
-    Amount.objects.bulk_create(ingredient_list)
+    RecipeIngredient.objects.bulk_create(ingredient_list)
 
 
 def create_model_instance(request, instance, serializer_name):
@@ -46,16 +45,15 @@ def create_model_instance(request, instance, serializer_name):
     )
     serializer.is_valid(raise_exception=True)
     serializer.save()
-    return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-def delete_model_instance(request, model_name, instance, error_message):
-    """Функция для удаления рецепта из избранного или из списка покупок."""
-    if not model_name.objects.filter(
-        user=request.user, recipe=instance
-    ).exists():
-        return Response(
-            {'errors': error_message}, status=status.HTTP_400_BAD_REQUEST
-        )
-    model_name.objects.filter(user=request.user, recipe=instance).delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)
+def create_list(ingredient_list, name, unit, amount):
+    shopping_list = ['Список покупок:\n']
+    for ingredient in ingredient_list:
+        name = ingredient[name]
+        unit = ingredient[unit]
+        amount = ingredient[amount]
+        shopping_list.append(f'\n{name} - {amount}, {unit}')
+    response = HttpResponse(shopping_list, content_type='text/plain')
+    response['Content-Disposition'] = 'attachment; filename="shopping_cart.txt"'
+    return response    

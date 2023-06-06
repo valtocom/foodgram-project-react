@@ -5,7 +5,7 @@ from rest_framework.validators import UniqueTogetherValidator
 
 from api.utils import Base64ImageField, create_ingredients
 from recipes.models import (
-    Amount, Favorite, Ingredient, Recipe, ShoppingCart, Tag
+    Favorite, Ingredient, Recipe, RecipeIngredient, ShoppingCart, Tag
 )
 from users.models import User, Subscription
 
@@ -131,7 +131,7 @@ class IngredientGetSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Amount
+        model = RecipeIngredient
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
@@ -141,7 +141,7 @@ class IngredientPostSerializer(serializers.ModelSerializer):
     amount = serializers.IntegerField()
 
     class Meta:
-        model = Amount
+        model = RecipeIngredient
         fields = ('id', 'amount')
 
 
@@ -186,7 +186,7 @@ class RecipeGetSerializer(serializers.ModelSerializer):
 class RecipeCreateSerializer(serializers.ModelSerializer):
     """Сериализатор для добавления рецепта."""
     ingredients = IngredientPostSerializer(
-        many=True, source='amount'
+        many=True, source='recipeingredients'
     )
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
@@ -203,10 +203,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         ingredients_list = []
-        for ingredient in data.get('amount'):
+        for ingredient in data.get('recipeingredients'):
             if ingredient.get('amount') <= 0:
                 raise serializers.ValidationError(
-                    'Количество не может быть меньше 1'
+                    'Количество не может быть меньше или равно нулю'
                 )
             ingredients_list.append(ingredient.get('id'))
         if len(set(ingredients_list)) != len(ingredients_list):
@@ -218,7 +218,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         request = self.context.get('request')
-        ingredients = validated_data.pop('amount')
+        ingredients = validated_data.pop('recipeingredients')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(author=request.user, **validated_data)
         recipe.tags.set(tags)
@@ -227,14 +227,13 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        ingredients = validated_data.pop('amount')
+        ingredients = validated_data.pop('recipeingredients')
         tags = validated_data.pop('tags')
         instance.tags.clear()
         instance.tags.set(tags)
-        Amount.objects.filter(recipe=instance).delete()
+        RecipeIngredient.objects.filter(recipe=instance).delete()
         super().update(instance, validated_data)
         create_ingredients(ingredients, instance)
-        instance.save()
         return instance
 
     def to_representation(self, instance):

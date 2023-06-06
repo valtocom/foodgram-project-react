@@ -1,34 +1,28 @@
-import csv
+import csv, os
 
-from django.apps import apps
-from django.core.management import BaseCommand
-from django.shortcuts import get_object_or_404
+from django.core.management.base import BaseCommand
 
-
-MODELS_FIELDS = {}
+from recipes.models import Ingredient
 
 
 class Command(BaseCommand):
+    """Переводит конкретные csv файлы
+    (по  адресу 'backend/data/') в базу данных проекта:
+     python manage.py fill_database """
+
     help = 'Перевод из csv файлов в модели проекта'
 
-    def add_arguments(self, parser):
-        parser.add_argument('--path', type=str, help="file path")
-        parser.add_argument('--model_name', type=str, help="model name")
-        parser.add_argument(
-            '--app_name',
-            type=str,
-            help="django app name that the model is connected to"
-        )
+    def fill_ingredient(self):
+        """Заполнение модели Ingredient."""
+        with open(
+            os.path.join('backend/data/ingredients.csv'),
+            'r', encoding='utf-8'
+        ) as csv_file:
+            data = csv.DictReader(csv_file)
+            for item in data:
+                Ingredient.objects.get_or_create(
+                    name=item['name'], measurement_unit=item['measurement_unit']
+                )
 
     def handle(self, *args, **options):
-        file_path = options['path']
-        model = apps.get_model(options['app_name'], options['model_name'])
-        with open(file_path, 'rt', encoding='utf-8') as csv_file:
-            reader = csv.DictReader(csv_file, delimiter=',')
-            for row in reader:
-                for field, value in row.items():
-                    if field in MODELS_FIELDS.keys():
-                        row[field] = get_object_or_404(
-                            MODELS_FIELDS[field], pk=value
-                        )
-                model.objects.create(**row)
+        self.fill_ingredient()

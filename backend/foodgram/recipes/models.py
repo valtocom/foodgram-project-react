@@ -1,6 +1,8 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 
-from users.models import User
+
+User = get_user_model()
 
 
 class Tag(models.Model):
@@ -72,13 +74,13 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         Ingredient,
         verbose_name='Ингредиенты',
-        through='Amount',
+        through='RecipeIngredient',
     )
     tags = models.ManyToManyField(
         Tag,
         verbose_name='Тег',
     )
-    cooking_time = models.IntegerField(
+    cooking_time = models.PositiveIntegerField(
         verbose_name='Время приготовления',
     )
     pub_date = models.DateTimeField(
@@ -95,7 +97,7 @@ class Recipe(models.Model):
         return f'Автор: {self.author.username} Рецепт: {self.name}'
 
 
-class Amount(models.Model):
+class RecipeIngredient(models.Model):
     """Модель для объединения рецептов и ингредиентов."""
     recipe = models.ForeignKey(
         Recipe,
@@ -109,7 +111,7 @@ class Amount(models.Model):
         related_name='ingredient',
         on_delete=models.CASCADE,
     )
-    amount = models.IntegerField(
+    amount = models.PositiveIntegerField(
         verbose_name='Количество ингредиентов',
     )
 
