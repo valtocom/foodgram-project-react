@@ -1,4 +1,5 @@
-import csv, os
+import csv
+import os
 
 from django.core.management.base import BaseCommand
 
@@ -21,7 +22,8 @@ class Command(BaseCommand):
             data = csv.DictReader(csv_file)
             for item in data:
                 Ingredient.objects.get_or_create(
-                    name=item['name'], measurement_unit=item['measurement_unit']
+                    name=item['name'],
+                    measurement_unit=item['measurement_unit']
                 )
 
     def handle(self, *args, **options):

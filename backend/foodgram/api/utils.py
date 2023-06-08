@@ -55,5 +55,7 @@ def create_list(ingredient_list, name, unit, amount):
         amount = ingredient[amount]
         shopping_list.append(f'\n{name} - {amount}, {unit}')
     response = HttpResponse(shopping_list, content_type='text/plain')
-    response['Content-Disposition'] = 'attachment; filename="shopping_cart.txt"'
-    return response    
+    response[
+        'Content-Disposition'
+    ] = 'attachment; filename="shopping_cart.txt"'
+    return response

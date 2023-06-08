@@ -121,7 +121,7 @@ class RecipeIngredient(models.Model):
 
     def __str__(self):
         return f'{self.ingredient} в {self.recipe}'
-    
+
 
 class Favorite(models.Model):
     """Модель для работы со списком избранного."""

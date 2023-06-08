@@ -7,7 +7,7 @@ from api.utils import Base64ImageField, create_ingredients
 from recipes.models import (
     Favorite, Ingredient, Recipe, RecipeIngredient, ShoppingCart, Tag
 )
-from users.models import User, Subscription
+from users.models import Subscription, User
 
 
 class SignUpSerializer(UserCreateSerializer):
@@ -26,7 +26,8 @@ class UserGetSerializer(UserSerializer):
     class Meta:
         model = User
         fields = (
-            'email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed'
+            'email', 'id', 'username', 'first_name',
+            'last_name', 'is_subscribed'
         )
 
     def get_is_subscribed(self, obj):
@@ -59,7 +60,7 @@ class UserSubscribeRepresentSerializer(UserGetSerializer):
             'last_name', 'is_subscribed', 'recipes', 'recipes_count'
         )
         read_only_fields = (
-            'email', 'username', 'first_name', 
+            'email', 'username', 'first_name',
             'last_name', 'is_subscribed', 'recipes', 'recipes_count'
         )
 

@@ -101,18 +101,24 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
             create_model_instance(request, recipe, FavoriteSerializer)
-            return Response(FavoriteSerializer.data, status=status.HTTP_201_CREATED)
+            return Response(
+                FavoriteSerializer.data,
+                status=status.HTTP_201_CREATED
+            )
 
         if request.method == 'DELETE':
             error_message = 'У вас нет этого рецепта в избранном'
-        
-            if not Favorite.objects.filter(user=request.user, recipe=recipe).exists():
+
+            if not Favorite.objects.filter(
+                user=request.user,
+                recipe=recipe
+            ).exists():
                 return Response(
-                    {'errors': error_message}, status=status.HTTP_400_BAD_REQUEST
+                    {'errors': error_message},
+                    status=status.HTTP_400_BAD_REQUEST
                 )
             Favorite.objects.filter(user=request.user, recipe=recipe).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-
 
     @action(
         detail=True,
@@ -122,9 +128,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def shopping_cart(self, request, pk):
         """Работа со списком покупок."""
         recipe = get_object_or_404(Recipe, id=pk)
+
         if request.method == 'POST':
             create_model_instance(request, recipe, ShoppingCartSerializer)
-            return Response(ShoppingCartSerializer.data, status=status.HTTP_201_CREATED)
+            return Response(
+                ShoppingCartSerializer.data,
+                status=status.HTTP_201_CREATED
+            )
 
     @action(
         detail=False,
@@ -141,4 +151,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ingredient_name = 'ingredient__name'
         ingredient_unit = 'ingredient__measurement_unit'
         ingredient_amount = 'ingredient_amount'
-        create_list(ingredients, ingredient_name, ingredient_unit, ingredient_amount)
+        create_list(
+            ingredients, ingredient_name,
+            ingredient_unit, ingredient_amount
+        )

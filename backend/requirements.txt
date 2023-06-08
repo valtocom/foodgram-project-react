@@ -2,9 +2,12 @@ asgiref==3.7.2
 Django==3.2.19
 django-filter==23.2
 djangorestframework==3.14.0
+gunicorn==20.0.4
+psycopg2-binary==2.8.6
 djoser==2.1.0
 flake8==5.0.4
 Pillow==9.5.0
+python-dotenv
 pytz==2023.3
 requests==2.31.0
 sqlparse==0.4.4
