@@ -10,21 +10,20 @@ services:
 
 
   web:
-    build:
-      context: ../backend
-      dockerfile: Dockerfile
+    image: valtocom/backend
     restart: always
-    ports:
-     - "8000:8000"
+    volumes:
+      - static_value:/app/static/
+      - media_value:/app/media/
     depends_on:
       - db
     env_file:
-      - ./.env 
+      - ./.env
 
 
   frontend:
     build:
-      context: ../frontend
+      context: valtocom/frontend
       dockerfile: Dockerfile
     volumes:
       - ../frontend/:/app/result_build/
