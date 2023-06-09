@@ -14,7 +14,7 @@ class Command(BaseCommand):
         parser.add_argument('ingredients.csv', type=str)
 
     def handle(self, *args, **options):
-        file_path = options['ingredients.csv']
+        file_path = options['path']
         with open(file_path, 'r', encoding='utf-8') as f:
             reader = csv.reader(f)
             next(reader)
