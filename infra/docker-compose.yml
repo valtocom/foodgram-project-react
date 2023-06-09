@@ -23,7 +23,7 @@ services:
 
   frontend:
     build:
-      context: valtocom/frontend
+      context: frontend
       dockerfile: Dockerfile
     volumes:
       - ../frontend/:/app/result_build/
