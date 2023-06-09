@@ -112,14 +112,14 @@ class TagSerialiser(serializers.ModelSerializer):
     """Сериализатор для работы с тегами."""
     class Meta:
         model = Tag
-        fields = ('name', 'color', 'slug')
+        fields = '__all__'
 
 
 class IngredientSerializer(serializers.ModelSerializer):
     """Сериализатор для работы с ингредиентами."""
     class Meta:
         model = Ingredient
-        fields = ('name', 'measurement_unit')
+        fields = '__all__'
 
 
 class IngredientGetSerializer(serializers.ModelSerializer):
