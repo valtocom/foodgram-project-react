@@ -8,15 +8,15 @@ from recipes.models import Ingredient
 
 class Command(BaseCommand):
     """Переводит конкретные csv файлы
-    (по  адресу 'backend/data/') в базу данных проекта:
-     python manage.py fill_database """
+    (по  адресу 'data/') в базу данных проекта:
+     python manage.py fillbase """
 
     help = 'Перевод из csv файлов в модели проекта'
 
     def fill_ingredient(self):
         """Заполнение модели Ingredient."""
         with open(
-            os.path.join('backend/data/ingredients.csv'),
+            os.path.join('data/ingredients.csv'),
             'r', encoding='utf-8'
         ) as csv_file:
             data = csv.DictReader(csv_file)
