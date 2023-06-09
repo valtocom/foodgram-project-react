@@ -22,9 +22,7 @@ services:
 
 
   frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
