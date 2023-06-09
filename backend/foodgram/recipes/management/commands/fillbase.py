@@ -7,16 +7,14 @@ from recipes.models import Ingredient
 
 
 class Command(BaseCommand):
-    """Переводит конкретные csv файлы
-    (по  адресу 'data/') в базу данных проекта:
-     python manage.py fillbase """
+    """Переводит csv файлы в базу данных проекта."""
 
     help = 'Перевод из csv файлов в модели проекта'
 
     def fill_ingredient(self):
         """Заполнение модели Ingredient."""
         with open(
-            os.path.join('data/ingredients.csv'),
+            os.path.join('backend/ingredients.csv'),
             'r', encoding='utf-8'
         ) as csv_file:
             data = csv.DictReader(csv_file)
