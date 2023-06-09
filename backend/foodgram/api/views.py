@@ -1,6 +1,6 @@
 from django.db.models import Sum
 from django_filters.rest_framework import DjangoFilterBackend
-from django.shortcuts import get_object_or_404
+from django.shortcuts import HttpResponse, get_object_or_404
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -14,9 +14,10 @@ from api.serializers import (
     RecipeCreateSerializer, RecipeGetSerializer, ShoppingCartSerializer,
     TagSerialiser, UserSubscribeRepresentSerializer, SubscribeSerializer
 )
-from api.utils import create_model_instance, create_list
+from api.utils import create_model_instance, delete_model_instance
 from recipes.models import (
-    Favorite, Ingredient, Recipe, RecipeIngredient, Tag
+    Favorite, Ingredient, Recipe,
+    RecipeIngredient, ShoppingCart, Tag
 )
 from users.models import Subscription, User
 
@@ -79,7 +80,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    """Работа с рецептами. Отправка файла со списком рецептов."""
+    """Работа с рецептами."""
     queryset = Recipe.objects.all()
     permission_classes = (IsAdminAuthorOrReadOnly, )
     filter_backends = (DjangoFilterBackend,)
@@ -97,28 +98,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated, ]
     )
     def favorite(self, request, pk):
-        """Работа с избранными рецептами."""
+        """Работа с избранными рецептами. """
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
-            create_model_instance(request, recipe, FavoriteSerializer)
-            return Response(
-                FavoriteSerializer.data,
-                status=status.HTTP_201_CREATED
-            )
+            return create_model_instance(request, recipe, FavoriteSerializer)
 
         if request.method == 'DELETE':
             error_message = 'У вас нет этого рецепта в избранном'
-
-            if not Favorite.objects.filter(
-                user=request.user,
-                recipe=recipe
-            ).exists():
-                return Response(
-                    {'errors': error_message},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            Favorite.objects.filter(user=request.user, recipe=recipe).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return delete_model_instance(
+                request, Favorite,
+                recipe, error_message
+            )
 
     @action(
         detail=True,
@@ -128,12 +118,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def shopping_cart(self, request, pk):
         """Работа со списком покупок."""
         recipe = get_object_or_404(Recipe, id=pk)
-
         if request.method == 'POST':
-            create_model_instance(request, recipe, ShoppingCartSerializer)
-            return Response(
-                ShoppingCartSerializer.data,
-                status=status.HTTP_201_CREATED
+            return create_model_instance(
+                request, recipe,
+                ShoppingCartSerializer
+            )
+
+        if request.method == 'DELETE':
+            error_message = 'У вас нет этого рецепта в списке покупок'
+            return delete_model_instance(
+                request, ShoppingCart,
+                recipe, error_message
             )
 
     @action(
@@ -148,10 +143,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ).values(
             'ingredient__name', 'ingredient__measurement_unit'
         ).annotate(ingredient_amount=Sum('amount'))
-        ingredient_name = 'ingredient__name'
-        ingredient_unit = 'ingredient__measurement_unit'
-        ingredient_amount = 'ingredient_amount'
-        create_list(
-            ingredients, ingredient_name,
-            ingredient_unit, ingredient_amount
-        )
+        shopping_list = ['Список покупок:\n']
+        for ingredient in ingredients:
+            name = ingredient['ingredient__name']
+            unit = ingredient['ingredient__measurement_unit']
+            amount = ingredient['ingredient_amount']
+            shopping_list.append(f'\n{name} - {amount}, {unit}')
+        response = HttpResponse(shopping_list, content_type='text/plain')
+        response[
+            'Content-Disposition'
+        ] = 'attachment; filename="shopping_cart.txt"'
+        return response

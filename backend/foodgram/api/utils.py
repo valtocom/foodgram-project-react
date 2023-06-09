@@ -1,8 +1,9 @@
 import base64
 
-from django.shortcuts import HttpResponse, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.core.files.base import ContentFile
-from rest_framework import serializers
+from rest_framework import serializers, status
+from rest_framework.response import Response
 
 from recipes.models import Ingredient, RecipeIngredient
 
@@ -38,24 +39,25 @@ def create_ingredients(ingredients, recipe):
 
 
 def create_model_instance(request, instance, serializer_name):
-    """Функция для добавления рецепта в избранное и в список покупок."""
+    """Функция для добавления рецепта в избранное."""
     serializer = serializer_name(
         data={'user': request.user.id, 'recipe': instance.id, },
         context={'request': request}
     )
     serializer.is_valid(raise_exception=True)
     serializer.save()
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-def create_list(ingredient_list, name, unit, amount):
-    shopping_list = ['Список покупок:\n']
-    for ingredient in ingredient_list:
-        name = ingredient[name]
-        unit = ingredient[unit]
-        amount = ingredient[amount]
-        shopping_list.append(f'\n{name} - {amount}, {unit}')
-    response = HttpResponse(shopping_list, content_type='text/plain')
-    response[
-        'Content-Disposition'
-    ] = 'attachment; filename="shopping_cart.txt"'
-    return response
+def delete_model_instance(request, model_name, instance, error_message):
+    """Функция для удаления рецепта из избранного."""
+    if not model_name.objects.filter(
+        user=request.user,
+        recipe=instance
+    ).exists():
+        return Response(
+            {'errors': error_message},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    model_name.objects.filter(user=request.user, recipe=instance).delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
