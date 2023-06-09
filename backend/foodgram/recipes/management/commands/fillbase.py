@@ -11,7 +11,7 @@ class Command(BaseCommand):
     help = 'Перевод из csv файлов в модели проекта'
 
     def add_arguments(self, parser):
-        parser.add_argument('ingredients.csv', type=str)
+        parser.add_argument('path', type=str)
 
     def handle(self, *args, **options):
         file_path = options['path']
