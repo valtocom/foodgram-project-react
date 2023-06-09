@@ -44,7 +44,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     """Сериализатор для работы с краткой информацией о рецепте."""
     class Meta:
         model = Recipe
-        fields = ('name', 'image', 'cooking_time')
+        fields = ('id', 'name', 'image', 'cooking_time')
 
 
 class UserSubscribeRepresentSerializer(UserGetSerializer):
