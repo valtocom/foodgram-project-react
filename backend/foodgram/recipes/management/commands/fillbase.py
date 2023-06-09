@@ -6,9 +6,7 @@ from recipes.models import Ingredient
 
 
 class Command(BaseCommand):
-    """Переводит csv файлы в базу данных проекта."""
-
-    help = 'Перевод из csv файлов в модели проекта'
+    help = 'Импорт данных из csv в модель Ingredient'
 
     def add_arguments(self, parser):
         parser.add_argument('path', type=str)
