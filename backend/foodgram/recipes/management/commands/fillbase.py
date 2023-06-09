@@ -14,7 +14,7 @@ class Command(BaseCommand):
     def fill_ingredient(self):
         """Заполнение модели Ingredient."""
         with open(
-            os.path.join('backend/ingredients.csv'),
+            os.path.join('ingredients.csv'),
             'r', encoding='utf-8'
         ) as csv_file:
             data = csv.DictReader(csv_file)
