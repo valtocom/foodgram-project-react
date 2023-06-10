@@ -51,9 +51,8 @@ class SubscribeView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class SubscriptionsViewSet(
-    mixins.ListModelMixin, viewsets.GenericViewSet
-):
+class UserSubscriptionsViewSet(mixins.ListModelMixin,
+                               viewsets.GenericViewSet):
     """Получение списка всех подписок на пользователей."""
     serializer_class = UserSubscribeRepresentSerializer
 
