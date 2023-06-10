@@ -85,7 +85,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     http_method_names = ['get', 'post', 'patch', 'delete']
-    pagination_class = None
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):

@@ -64,6 +64,14 @@ class UserSubscribeRepresentSerializer(UserGetSerializer):
             'last_name', 'is_subscribed', 'recipes', 'recipes_count'
         )
 
+    def get_is_subscribed(self, obj):
+        return (
+            self.context.get('request').user.is_authenticated
+            and Subscription.objects.filter(
+                user=self.context.get('request').user, author=obj
+            ).exists()
+        )
+
     def get_recipes(self, obj):
         request = self.context.get('request')
         recipes_limit = None
