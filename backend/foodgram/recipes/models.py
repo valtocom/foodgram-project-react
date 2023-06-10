@@ -152,12 +152,12 @@ class ShoppingCart(models.Model):
     """Модель для работы со списком покупок."""
     user = models.ForeignKey(
         User,
-        related_name='shopping_cart',
+        related_name='carts',
         on_delete=models.CASCADE,
     )
     recipe = models.ForeignKey(
         Recipe,
-        related_name='recipe_shopping_cart',
+        related_name='carts',
         on_delete=models.CASCADE,
     )
 
