@@ -115,7 +115,7 @@ class TagSerialiser(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate(self, data):
-        if data.get('color') == r'^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$':
+        if data.get('color') != r'^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$':
             raise serializers.ValidationError(
                 'Недопустимый формат ввода'
             )
