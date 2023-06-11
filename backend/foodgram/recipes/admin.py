@@ -27,7 +27,7 @@ class RecipeIngredientInline(admin.TabularInline):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'name', 'author', 'favorites_amount')
+    list_display = ('pk', 'name', 'author', 'favorite_recipe')
     search_fields = ('name', 'author')
     list_filter = ('name', 'author', 'tags')
     empty_value_display = settings.EMPTY_VALUE
