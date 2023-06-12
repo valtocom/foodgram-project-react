@@ -13,5 +13,4 @@ class UserAdmin(UserAdmin):
             'fields': ('is_active', 'is_staff',
                        'is_superuser', 'groups', 'user_permissions'),
         }),
-        ('Даты', {'fields': ('last_login',)}),
     )

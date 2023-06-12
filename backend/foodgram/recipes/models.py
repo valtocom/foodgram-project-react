@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import RegexValidator
 from django.db import models
 
 
@@ -16,6 +17,12 @@ class Tag(models.Model):
         verbose_name='Цветовой HEX-код',
         max_length=7,
         unique=True,
+        validators=[
+            RegexValidator(
+                regex='^#(?:[0-9a-fA-F]{3}){1,2}$',
+                message='Color must be HEX'
+            ),
+        ]
     )
     slug = models.SlugField(
         verbose_name='Slug',
