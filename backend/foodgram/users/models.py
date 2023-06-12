@@ -23,6 +23,12 @@ class User(AbstractUser):
         max_length=150,
         null=True,
     )
+    password = models.CharField(
+        verbose_name='Пароль',
+        max_length=150,
+        blank=False,
+        null=False,
+    )    
 
     class Meta:
         verbose_name = 'Пользователь'
