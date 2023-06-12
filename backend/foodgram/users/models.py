@@ -28,7 +28,7 @@ class User(AbstractUser):
         max_length=150,
         blank=False,
         null=False,
-    )    
+    )
 
     class Meta:
         verbose_name = 'Пользователь'
